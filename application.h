@@ -6,6 +6,11 @@
 #include <stdio.h>
 #include <iostream>
 #include <filesystem>
+#include <vector>
+#include <string>
+
+#include "vao.h"
+#include "program.h"
 
 #include <stb_image.h>
 
@@ -50,5 +55,9 @@ namespace Application
         private:
             GLFWwindow* window_;
             ImVec4 clear_color_ = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+            std::vector<float> vertices_positions_ = {};
+            MyGL::Vao* vao_ = nullptr;
+            MyGL::Program* program_ = nullptr;
     };
 }

@@ -17,11 +17,11 @@ add_library(stb_image STATIC stb_image/stb_image.cpp
                              stb_image/stb_image_write.cpp)
 
 add_library(imgui_lib STATIC)
-target_link_directories(imgui_lib PUBLIC imgui/sources imgui/backend)
+target_link_libraries(imgui_lib stb_image glfw GLEW::GLEW)
 add_subdirectory(imgui)
 
 add_library(utils_lib STATIC)
-target_link_directories(utils_lib PUBLIC include)
+target_link_libraries(utils_lib imgui_lib stb_image glfw GLEW::GLEW)
 add_subdirectory(src)
 
 add_executable(oceanGL main.cpp application.cpp)

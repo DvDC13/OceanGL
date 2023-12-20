@@ -27,11 +27,12 @@ namespace MyGL
         Program(); 
 
         static Program* make_program(std::string& vertex_shader_path, std::string& fragment_shader_path,
-                std::string tessellation_control_shader_path = nullptr, std::string tessellation_evaluation_shader_path = nullptr);
+                std::string& tessellation_control_shader_path, std::string& tessellation_evaluation_shader_path);
         
         char* get_log();
         bool is_ready();
         void use();
+        void unuse();
 
         inline unsigned int get_program_id() const { return m_ProgramID; }
 
@@ -43,7 +44,7 @@ namespace MyGL
         Shaders storeShaders(std::string& vertex_shader_path, std::string& fragment_shader_path);
         Shaders storeShaders(std::string& vertex_shader_path, std::string& fragment_shader_path,
                 std::string& tessellation_control_shader_path, std::string& tessellation_evaluation_shader_path);
-                
+
         bool is_shader_ready(unsigned int shader_id);
         char* get_shader_log(unsigned int shader_id);
         unsigned int compileShader(unsigned int type, const std::string& source);
