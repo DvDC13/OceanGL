@@ -59,5 +59,7 @@ namespace Application
             std::vector<float> vertices_positions_ = {};
             MyGL::Vao* vao_ = nullptr;
             MyGL::Program* program_ = nullptr;
+
+            GLuint VAO, VBO, shaderProgram;
     };
 }

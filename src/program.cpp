@@ -14,14 +14,15 @@ namespace MyGL
 
         Shaders shaders = program->storeShaders(vertex_shader_path, fragment_shader_path, tessellation_control_shader_path, tessellation_evaluation_shader_path);
         unsigned int vertex_shader = program->compileShader(GL_VERTEX_SHADER, shaders.vertex_shader_path);
-        unsigned int fragment_shader = program->compileShader(GL_FRAGMENT_SHADER, shaders.fragment_shader_path);
         unsigned int tessellation_control_shader = program->compileShader(GL_TESS_CONTROL_SHADER, shaders.tessellation_control_shader_path);
         unsigned int tessellation_evaluation_shader = program->compileShader(GL_TESS_EVALUATION_SHADER, shaders.tessellation_evaluation_shader_path);
+        unsigned int fragment_shader = program->compileShader(GL_FRAGMENT_SHADER, shaders.fragment_shader_path);
 
         glAttachShader(program->m_ProgramID, vertex_shader); CHECK_GL_ERROR();
-        glAttachShader(program->m_ProgramID, fragment_shader); CHECK_GL_ERROR();
         glAttachShader(program->m_ProgramID, tessellation_control_shader); CHECK_GL_ERROR();
         glAttachShader(program->m_ProgramID, tessellation_evaluation_shader); CHECK_GL_ERROR();
+        glAttachShader(program->m_ProgramID, fragment_shader); CHECK_GL_ERROR();
+
         glLinkProgram(program->m_ProgramID); CHECK_GL_ERROR();
 
         if (!program->is_ready())
@@ -35,9 +36,9 @@ namespace MyGL
         }
 
         glDeleteShader(vertex_shader); CHECK_GL_ERROR();
-        glDeleteShader(fragment_shader); CHECK_GL_ERROR();
         glDeleteShader(tessellation_control_shader); CHECK_GL_ERROR();
         glDeleteShader(tessellation_evaluation_shader); CHECK_GL_ERROR();
+        glDeleteShader(fragment_shader); CHECK_GL_ERROR();
 
         return program;
     }
@@ -177,7 +178,16 @@ namespace MyGL
         if (!is_shader_ready(id))
         {
             std::cerr << "ERROR::SHADER::COMPILATION_FAILED" << std::endl;
-            std::cerr << "Shader type: " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << std::endl;
+
+            std::cerr << "Shader type: ";
+            if (type == GL_VERTEX_SHADER)
+                std::cerr << "Vertex shader" << std::endl;
+            else if (type == GL_TESS_CONTROL_SHADER)
+                std::cerr << "Tessellation control shader" << std::endl;
+            else if (type == GL_TESS_EVALUATION_SHADER)
+                std::cerr << "Tessellation evaluation shader" << std::endl;
+            else if (type == GL_FRAGMENT_SHADER)
+                std::cerr << "Fragment shader" << std::endl;
             char* log = get_shader_log(id);
             std::cerr << log << std::endl;
             glDeleteShader(id); CHECK_GL_ERROR();

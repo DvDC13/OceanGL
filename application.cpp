@@ -11,7 +11,7 @@ namespace Application
         // GL 3.0 + GLSL 130
         const char* glsl_version = "#version 130";
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
@@ -28,6 +28,9 @@ namespace Application
         {
             fprintf(stderr, "Failed to initialize OpenGL loader!\n");
         }
+
+        std::cout << "OpenGL version: " << glGetString(GL_VERSION) << " initialized on " << glGetString(GL_VENDOR) << " " << glGetString(GL_RENDERER)
+                << " using GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
@@ -64,6 +67,12 @@ namespace Application
         {
             glfwPollEvents();
 
+            int display_w, display_h;
+            glfwGetFramebufferSize(window_, &display_w, &display_h);
+            glViewport(0, 0, display_w, display_h);
+            glClearColor(clear_color_.x * clear_color_.w, clear_color_.y * clear_color_.w, clear_color_.z * clear_color_.w, clear_color_.w);
+            glClear(GL_COLOR_BUFFER_BIT);
+
             // Start the Dear ImGui frame
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
@@ -73,11 +82,7 @@ namespace Application
 
             // Rendering
             ImGui::Render();
-            int display_w, display_h;
-            glfwGetFramebufferSize(window_, &display_w, &display_h);
-            glViewport(0, 0, display_w, display_h);
-            glClearColor(clear_color_.x * clear_color_.w, clear_color_.y * clear_color_.w, clear_color_.z * clear_color_.w, clear_color_.w);
-            glClear(GL_COLOR_BUFFER_BIT);
+
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
             glfwSwapBuffers(window_);
@@ -93,32 +98,39 @@ namespace Application
 
         program_ = MyGL::Program::make_program(vertex_shader_path, fragment_shader_path, tessellation_control_shader_path, tessellation_evaluation_shader_path);
 
-        //program_->use();
+        if (!program_)
+        {
+            std::cerr << "Failed to create program !" << std::endl;
+            return;
+        }
+
+        program_->use();
 
         // create a plane
-        // vertices_positions_ = {
-        //     -0.5f, -0.5f, 0.0f, // bottom left
-        //      0.5f, -0.5f, 0.0f, // bottom right
-        //      0.5f,  0.5f, 0.0f, // top right
-        //     -0.5f,  0.5f, 0.0f  // top left
-        // };
+        vertices_positions_ = {
+            -0.5f, -0.5f, 0.0f, // bottom left
+             0.5f, -0.5f, 0.0f, // bottom right
+             0.5f,  0.5f, 0.0f, // top right
+            -0.5f,  0.5f, 0.0f  // top left
+        };
 
-        // MyGL::Vbo vbo;
-        // vbo.bind();
+        vao_ = new MyGL::Vao();
+        vao_->bind();
 
-        // vbo.setData(vertices_positions_.data(), vertices_positions_.size() * sizeof(float), GL_STATIC_DRAW);
+        MyGL::Vbo vbo;
+        vbo.bind();
 
-        // MyGL::Vbl vbl;
-        // vbl.push<float>(3);
+        vbo.setData(vertices_positions_.data(), vertices_positions_.size() * sizeof(float), GL_STATIC_DRAW);
 
-        // vao_ = new MyGL::Vao();
-        // vao_->bind();
-        // vao_->addBuffer(vbo, vbl);
+        MyGL::Vbl vbl;
+        vbl.push<float>(3);
 
-        // vbo.unbind();
-        // vao_->unbind();
+        vao_->addBuffer(vbo, vbl);
 
-        // program_->unuse();
+        vbo.unbind();
+        vao_->unbind();
+
+        program_->unuse();
     }
 
     void Application::Update()
@@ -138,14 +150,15 @@ namespace Application
             ImGui::EndMainMenuBar();
         }
 
-        // program_->use();
+        program_->use();
 
-        // vao_->bind();
+        vao_->bind();
 
-        // glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_PATCHES, 0, 4); CHECK_GL_ERROR();
+        glPatchParameteri(GL_PATCH_VERTICES, 4); CHECK_GL_ERROR();
 
-        // vao_->unbind();
+        vao_->unbind();
 
-        // program_->unuse();
+        program_->unuse();
     }
 }

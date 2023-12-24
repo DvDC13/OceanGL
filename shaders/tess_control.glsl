@@ -1,16 +1,16 @@
 #version 450
 
-layout(quads, equal_spacing, ccw) in;
+layout (vertices = 4) out;
 
 void main()
 {
-    gl_Position = gl_in[0].gl_Position;
-    EmitVertex();
-    gl_Position = gl_in[1].gl_Position;
-    EmitVertex();
-    gl_Position = gl_in[2].gl_Position;
-    EmitVertex();
-    gl_Position = gl_in[3].gl_Position;
-    EmitVertex();
-    EndPrimitive();
+    gl_TessLevelInner[0] = 4.0;
+    gl_TessLevelInner[1] = 4.0;
+
+    gl_TessLevelOuter[0] = 4.0;
+    gl_TessLevelOuter[1] = 4.0;
+    gl_TessLevelOuter[2] = 4.0;
+    gl_TessLevelOuter[3] = 4.0;
+
+    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 }
