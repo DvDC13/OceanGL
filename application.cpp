@@ -1,7 +1,5 @@
 #include "application.h"
 
-#include "ocean.h"
-
 namespace Application
 {
     Application::Application()
@@ -18,7 +16,7 @@ namespace Application
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
         // Create window with graphics context
-        window_ = glfwCreateWindow(1920, 1080, "OceanGL Simulation", nullptr, nullptr);
+        window_ = glfwCreateWindow(m_windowWidth, m_windowHeight, "OceanGL Simulation", nullptr, nullptr);
         if (window_ == nullptr)
             fprintf(stderr, "Failed to create GLFW window\n");
         glfwMakeContextCurrent(window_);
@@ -30,6 +28,8 @@ namespace Application
         {
             fprintf(stderr, "Failed to initialize OpenGL loader!\n");
         }
+
+        glEnable(GL_DEPTH_TEST);
 
         std::cout << "OpenGL version: " << glGetString(GL_VERSION) << " initialized on " << glGetString(GL_VENDOR) << " " << glGetString(GL_RENDERER)
                 << " using GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
@@ -48,6 +48,10 @@ namespace Application
         // Setup Platform/Renderer backends
         ImGui_ImplGlfw_InitForOpenGL(window_, true);
         ImGui_ImplOpenGL3_Init(glsl_version);
+
+        // Variables initialization
+        lastX = m_windowWidth / 2.0f;
+        lastY = m_windowHeight / 2.0f;
     }
 
     Application::~Application()
@@ -67,13 +71,19 @@ namespace Application
 
         while (!glfwWindowShouldClose(window_))
         {
+            float currentFrame = glfwGetTime();
+            deltaTime = currentFrame - lastFrame;
+            lastFrame = currentFrame;
+
             glfwPollEvents();
+
+            ProcessInput(window_);
 
             int display_w, display_h;
             glfwGetFramebufferSize(window_, &display_w, &display_h);
             glViewport(0, 0, display_w, display_h);
             glClearColor(clear_color_.x * clear_color_.w, clear_color_.y * clear_color_.w, clear_color_.z * clear_color_.w, clear_color_.w);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             // Start the Dear ImGui frame
             ImGui_ImplOpenGL3_NewFrame();
@@ -133,6 +143,8 @@ namespace Application
         vao_->unbind();
 
         program_->unuse();
+
+        camera_ = new Camera(0.0f, 0.0f, 2.0f, 0.0f, 1.0f, 0.0f, -90.0f, 0.0f);
     }
 
     void Application::Update()
@@ -154,7 +166,16 @@ namespace Application
 
         program_->use();
 
+        glm::mat4 view = camera_->GetViewMatrix();
+        glm::mat4 projection = glm::perspective(camera_->Zoom, (float)m_windowWidth / (float)m_windowHeight, 0.1f, 1000.0f);
+
+        program_->setUniformMat4f("view", view);
+        program_->setUniformMat4f("projection", projection);
+
         vao_->bind();
+
+        glm::mat4 model = glm::mat4(1.0f);
+        program_->setUniformMat4f("model", model);
 
         glDrawArrays(GL_PATCHES, 0, 4); CHECK_GL_ERROR();
         glPatchParameteri(GL_PATCH_VERTICES, 4); CHECK_GL_ERROR();
@@ -162,5 +183,20 @@ namespace Application
         vao_->unbind();
 
         program_->unuse();
+    }
+
+    void Application::ProcessInput(GLFWwindow* window)
+    {
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, true);
+
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            camera_->ProcessKeyboard(FORWARD, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            camera_->ProcessKeyboard(BACKWARD, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            camera_->ProcessKeyboard(LEFT, deltaTime);
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            camera_->ProcessKeyboard(RIGHT, deltaTime);
     }
 }

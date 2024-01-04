@@ -8,6 +8,10 @@
 #include <sstream>
 #include <unordered_map>
 
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
 #include "error.h"
 
 namespace MyGL
@@ -39,6 +43,8 @@ namespace MyGL
         void delete_program();
 
         int getUniformLocation(const std::string& name);
+
+        void setUniformMat4f(const std::string& name, const glm::mat4& matrix);
 
     private:
         Shaders storeShaders(std::string& vertex_shader_path, std::string& fragment_shader_path);

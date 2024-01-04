@@ -12,21 +12,12 @@
 #include "vao.h"
 #include "program.h"
 
+#include "camera.h"
+#include "ocean.h"
+
 #include <stb_image.h>
 
-#define GL_SILENCE_DEPRECATION
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-#include <GLES2/gl2.h>
-#endif
 #include <GLFW/glfw3.h>
-
-#if defined(_MSC_VER) && (_MSC_VER >= 1900) && !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
-#pragma comment(lib, "legacy_stdio_definitions")
-#endif
-
-#ifdef __EMSCRIPTEN__
-#include "../libs/emscripten/emscripten_mainloop_stub.h"
-#endif
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -46,9 +37,7 @@ namespace Application
             void Start();
             void Update();
 
-            void LoadImage(const std::string& filename);
-
-            void SaveImageAsPPM(const std::string& inputPath, const std::string& outputPath);
+            void ProcessInput(GLFWwindow* window);
 
             inline GLFWwindow* GetWindow() { return window_; }
 
@@ -56,10 +45,22 @@ namespace Application
             GLFWwindow* window_;
             ImVec4 clear_color_ = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+            int m_windowWidth = 1280;
+            int m_windowHeight = 720;
+
             std::vector<float> vertices_positions_ = {};
             MyGL::Vao* vao_ = nullptr;
             MyGL::Program* program_ = nullptr;
 
             GLuint VAO, VBO, shaderProgram;
+
+            Camera* camera_ = nullptr;
+            float lastX = 0.0f;
+            float lastY = 0.0f;
+
+            float deltaTime = 0.0f;
+            float lastFrame = 0.0f;
+
+            bool firstMouse = true;
     };
 }

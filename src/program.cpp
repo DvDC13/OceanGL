@@ -211,6 +211,12 @@ namespace MyGL
         return location;
     }
 
+    void Program::setUniformMat4f(const std::string& name, const glm::mat4& matrix)
+    {
+        glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix)); CHECK_GL_ERROR();
+    }
+
+
     void Program::delete_program()
     {
         glDeleteProgram(m_ProgramID); CHECK_GL_ERROR();
