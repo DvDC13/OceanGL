@@ -1,6 +1,6 @@
 #pragma once
 
-#include <complex.h>
+#include <complex>
 #include <vector>
 #include <random>
 

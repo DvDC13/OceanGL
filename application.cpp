@@ -18,7 +18,7 @@ namespace Application
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
         // Create window with graphics context
-        window_ = glfwCreateWindow(1920, 1080, "TVID Project", nullptr, nullptr);
+        window_ = glfwCreateWindow(1920, 1080, "OceanGL Simulation", nullptr, nullptr);
         if (window_ == nullptr)
             fprintf(stderr, "Failed to create GLFW window\n");
         glfwMakeContextCurrent(window_);
