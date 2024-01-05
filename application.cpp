@@ -2,6 +2,20 @@
 
 namespace Application
 {
+
+    Camera camera_(0.0f, 0.0f, 2.0f, 0.0f, 1.0f, 0.0f, -90.0f, 0.0f);
+    float lastX = 0.0f;
+    float lastY = 0.0f;
+
+    float deltaTime = 0.0f;
+    float lastFrame = 0.0f;
+
+    bool firstMouse = true;
+
+    void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+
+    void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
     Application::Application()
     {
         glfwSetErrorCallback(glfw_error_callback);
@@ -28,6 +42,9 @@ namespace Application
         {
             fprintf(stderr, "Failed to initialize OpenGL loader!\n");
         }
+
+        glfwSetCursorPosCallback(window_, mouse_callback);
+        glfwSetScrollCallback(window_, scroll_callback);
 
         glEnable(GL_DEPTH_TEST);
 
@@ -75,6 +92,8 @@ namespace Application
             deltaTime = currentFrame - lastFrame;
             lastFrame = currentFrame;
 
+            time = glfwGetTime();
+
             glfwPollEvents();
 
             ProcessInput(window_);
@@ -120,10 +139,10 @@ namespace Application
 
         // create a plane
         vertices_positions_ = {
-            -0.5f, -0.5f, 0.0f, // bottom left
-             0.5f, -0.5f, 0.0f, // bottom right
-             0.5f,  0.5f, 0.0f, // top right
-            -0.5f,  0.5f, 0.0f  // top left
+            -0.5f, 0.0f, -0.5f, // bottom left
+             0.5f, 0.0f, -0.5f, // bottom right
+             0.5f, 0.0f, 0.5f, // top right
+            -0.5f, 0.0f, 0.5f  // top left
         };
 
         vao_ = new MyGL::Vao();
@@ -143,8 +162,6 @@ namespace Application
         vao_->unbind();
 
         program_->unuse();
-
-        camera_ = new Camera(0.0f, 0.0f, 2.0f, 0.0f, 1.0f, 0.0f, -90.0f, 0.0f);
     }
 
     void Application::Update()
@@ -168,8 +185,10 @@ namespace Application
 
         program_->use();
 
-        glm::mat4 view = camera_->GetViewMatrix();
-        glm::mat4 projection = glm::perspective(camera_->Zoom, (float)m_windowWidth / (float)m_windowHeight, 0.1f, 1000.0f);
+        program_->setUniform1f("time", time);
+
+        glm::mat4 view = camera_.GetViewMatrix();
+        glm::mat4 projection = glm::perspective(camera_.Zoom, (float)m_windowWidth / (float)m_windowHeight, 0.1f, 1000.0f);
 
         program_->setUniformMat4f("view", view);
         program_->setUniformMat4f("projection", projection);
@@ -193,12 +212,35 @@ namespace Application
             glfwSetWindowShouldClose(window, true);
 
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            camera_->ProcessKeyboard(FORWARD, deltaTime);
+            camera_.ProcessKeyboard(FORWARD, deltaTime);
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            camera_->ProcessKeyboard(BACKWARD, deltaTime);
+            camera_.ProcessKeyboard(BACKWARD, deltaTime);
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            camera_->ProcessKeyboard(LEFT, deltaTime);
+            camera_.ProcessKeyboard(LEFT, deltaTime);
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            camera_->ProcessKeyboard(RIGHT, deltaTime);
+            camera_.ProcessKeyboard(RIGHT, deltaTime);
+    }
+
+    void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+    {
+        if (firstMouse)
+        {
+            lastX = xpos;
+            lastY = ypos;
+            firstMouse = false;
+        }
+
+        GLfloat xoffset = xpos - lastX;
+        GLfloat yoffset = lastY - ypos;
+
+        lastX = xpos;
+        lastY = ypos;
+
+        camera_.ProcessMouseMovement(xoffset, yoffset);
+    }
+
+    void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+    {
+        camera_.ProcessMouseScroll(yoffset);
     }
 }

@@ -44,6 +44,7 @@ namespace MyGL
 
         int getUniformLocation(const std::string& name);
 
+        void setUniform1f(const std::string& name, float v0);
         void setUniformMat4f(const std::string& name, const glm::mat4& matrix);
 
     private:

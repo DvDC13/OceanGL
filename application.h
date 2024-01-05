@@ -13,7 +13,6 @@
 #include "program.h"
 
 #include "camera.h"
-#include "ocean.h"
 
 #include <stb_image.h>
 
@@ -37,6 +36,8 @@ namespace Application
             void Start();
             void Update();
 
+            void RenderOcean();
+
             void ProcessInput(GLFWwindow* window);
 
             inline GLFWwindow* GetWindow() { return window_; }
@@ -54,13 +55,6 @@ namespace Application
 
             GLuint VAO, VBO, shaderProgram;
 
-            Camera* camera_ = nullptr;
-            float lastX = 0.0f;
-            float lastY = 0.0f;
-
-            float deltaTime = 0.0f;
-            float lastFrame = 0.0f;
-
-            bool firstMouse = true;
+            float time = 0.0f;
     };
 }

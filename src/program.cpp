@@ -211,11 +211,15 @@ namespace MyGL
         return location;
     }
 
+    void Program::setUniform1f(const std::string& name, float v0)
+    {
+        glUniform1f(getUniformLocation(name), v0); CHECK_GL_ERROR();
+    }
+
     void Program::setUniformMat4f(const std::string& name, const glm::mat4& matrix)
     {
         glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix)); CHECK_GL_ERROR();
     }
-
 
     void Program::delete_program()
     {
