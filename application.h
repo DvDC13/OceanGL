@@ -56,5 +56,6 @@ namespace Application
             GLuint VAO, VBO, shaderProgram;
 
             float time = 0.0f;
+            int numberOfWaves;
     };
 }

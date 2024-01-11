@@ -34,4 +34,4 @@ add_subdirectory(src)
 
 add_executable(oceanGL main.cpp application.cpp)
 
-target_link_libraries(oceanGL ${OPENGL_LIBRARIES} glfw GLEW::GLEW glm stb_image imgui_lib utils_lib)
+target_link_libraries(oceanGL ${OPENGL_LIBRARIES} glfw GLEW::GLEW glm stb_image imgui_lib utils_lib dl)

@@ -3,7 +3,7 @@
 namespace Application
 {
 
-    Camera camera_(0.0f, 0.0f, 2.0f, 0.0f, 1.0f, 0.0f, -90.0f, 0.0f);
+    Camera camera_(0.0f, 20.0f, 100.0f, 0.0f, 1.0f, 0.0f, -90.0f, 0.0f);
     float lastX = 0.0f;
     float lastY = 0.0f;
 
@@ -137,12 +137,12 @@ namespace Application
 
         program_->use();
 
-        // create a plane
+        // create a larger plane
         vertices_positions_ = {
-            -0.5f, 0.0f, -0.5f, // bottom left
-             0.5f, 0.0f, -0.5f, // bottom right
-             0.5f, 0.0f, 0.5f, // top right
-            -0.5f, 0.0f, 0.5f  // top left
+            -1.0f, 0.0f, -1.0f, // bottom left
+            1.0f, 0.0f, -1.0f, // bottom right
+            1.0f, 0.0f, 1.0f, // top right
+            -1.0f, 0.0f, 1.0f  // top left
         };
 
         vao_ = new MyGL::Vao();
@@ -162,6 +162,8 @@ namespace Application
         vao_->unbind();
 
         program_->unuse();
+
+        numberOfWaves = 40;
     }
 
     void Application::Update()
@@ -186,6 +188,7 @@ namespace Application
         program_->use();
 
         program_->setUniform1f("time", time);
+        program_->setUniform1i("numberOfWaves", numberOfWaves);
 
         glm::mat4 view = camera_.GetViewMatrix();
         glm::mat4 projection = glm::perspective(camera_.Zoom, (float)m_windowWidth / (float)m_windowHeight, 0.1f, 1000.0f);
@@ -196,6 +199,7 @@ namespace Application
         vao_->bind();
 
         glm::mat4 model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(50.0f, 50.0f, 50.0f));
         program_->setUniformMat4f("model", model);
 
         glDrawArrays(GL_PATCHES, 0, 4); CHECK_GL_ERROR();
