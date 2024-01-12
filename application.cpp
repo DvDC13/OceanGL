@@ -120,10 +120,10 @@ namespace Application
 
     void Application::Start()
     {
-        std::string vertex_shader_path = "/home/david/Desktop/Image/POGLA/PROJET/OceanGL/shaders/vertex_shader.glsl";
-        std::string fragment_shader_path = "/home/david/Desktop/Image/POGLA/PROJET/OceanGL/shaders/fragment_shader.glsl";
-        std::string tessellation_control_shader_path = "/home/david/Desktop/Image/POGLA/PROJET/OceanGL/shaders/tess_control.glsl";
-        std::string tessellation_evaluation_shader_path = "/home/david/Desktop/Image/POGLA/PROJET/OceanGL/shaders/tess_eval.glsl";
+        std::string vertex_shader_path = "../shaders/vertex_shader.glsl";
+        std::string fragment_shader_path = "../shaders/fragment_shader.glsl";
+        std::string tessellation_control_shader_path = "../shaders/tess_control.glsl";
+        std::string tessellation_evaluation_shader_path = "../shaders/tess_eval.glsl";
 
         program_ = MyGL::Program::make_program(vertex_shader_path, fragment_shader_path, tessellation_control_shader_path, tessellation_evaluation_shader_path);
 

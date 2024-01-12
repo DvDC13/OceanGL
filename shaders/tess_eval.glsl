@@ -19,9 +19,9 @@ out vec3 worldPosition;
 
 vec2 get_wave_height(vec2 position, vec2 direction, float frequency, float amplitude)
 {
-    position += vec2(1.0, 1.0);
+    position -= vec2(1.0, 1.0);
     float proj = dot(position, direction);
-    float height = amplitude * exp(sin(proj * frequency + time) - 1.0);
+    float height = amplitude * (exp(sin(proj * frequency + time) - 1.0) - (1 + exp(-2))/2);
     float derivative = height * cos(proj * frequency + time);
     return vec2(height, -derivative);
 }
