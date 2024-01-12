@@ -9,31 +9,41 @@ uniform mat4 projection;
 uniform float time;
 uniform int numberOfWaves;
 
+uniform float amplitude;
+uniform float frequency;
+uniform float amplitude_attenuation;
+uniform float frequency_amplification;
+
 out vec3 normal;
 out vec3 worldPosition;
 
-float get_wave_height(vec2 position, vec2 direction, float frequency, float amplitude)
+vec2 get_wave_height(vec2 position, vec2 direction, float frequency, float amplitude)
 {
     position += vec2(1.0, 1.0);
     float proj = dot(position, direction);
-    return amplitude * exp(sin(proj * frequency + time) - 1.0);
+    float height = amplitude * exp(sin(proj * frequency + time) - 1.0);
+    float derivative = height * cos(proj * frequency + time);
+    return vec2(height, -derivative);
 }
 
 float get_height_from_position(vec2 position)
 {
-    float height = 0;
-    float amplitude = 0.05;
-    float frequency = 3.0;
-    float amplitude_attenuation = 0.85;
-    float frequency_amplification = 1.15;
+    float height = 0.0;
 
     float random = 1.0;
 
+    float amplitude = amplitude;
+    float frequency = frequency;
+
     for(int i = 0; i < numberOfWaves; i++)
     {
+        vec2 direction = normalize(vec2(sin(random), cos(random)));
         amplitude *= amplitude_attenuation;
         frequency *= frequency_amplification;
-        height += get_wave_height(position, normalize(vec2(sin(random), cos(random))), frequency, amplitude);
+        vec2 wave_parameters = get_wave_height(position, direction, frequency, amplitude);
+        
+        height += wave_parameters.x;
+        position += direction * wave_parameters.y;
 
         random += 1229.0;
     }

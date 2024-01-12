@@ -3,7 +3,7 @@
 namespace Application
 {
 
-    Camera camera_(0.0f, 20.0f, 100.0f, 0.0f, 1.0f, 0.0f, -90.0f, 0.0f);
+    Camera camera_(0.0f, 250.0f, 800.0f, 0.0f, 1.0f, 0.0f, -90.0f, 0.0f);
     float lastX = 0.0f;
     float lastY = 0.0f;
 
@@ -96,8 +96,6 @@ namespace Application
 
             glfwPollEvents();
 
-            ProcessInput(window_);
-
             int display_w, display_h;
             glfwGetFramebufferSize(window_, &display_w, &display_h);
             glViewport(0, 0, display_w, display_h);
@@ -164,6 +162,19 @@ namespace Application
         program_->unuse();
 
         numberOfWaves = 40;
+        roughness = 0.5f;
+        metallic = 0.5f;
+
+        amplitude = 0.05f;
+        frequency = 3.0f;
+        amplitude_attenuation = 0.82f;
+        frequency_amplification = 1.18f;
+
+        lightPos = glm::vec3(0.0f, 10.0f, 0.0f);
+        lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+        lightIntensity = 1.0f;
+
+        oceanColor = glm::vec3(0.0f, 0.0f, 1.0f);
     }
 
     void Application::Update()
@@ -185,10 +196,43 @@ namespace Application
             ImGui::EndMainMenuBar();
         }
 
+        ImGui::Begin("Ocean Parameters");
+
+        ImGui::SliderInt("Number of waves", &numberOfWaves, 0, 100);
+        ImGui::SliderFloat("Roughness", &roughness, 0.0f, 1.0f);
+        ImGui::SliderFloat("Metallic", &metallic, 0.0f, 1.0f);
+        ImGui::SliderFloat("Amplitude", &amplitude, 0.0f, 1.0f);
+        ImGui::SliderFloat("Frequency", &frequency, 0.0f, 100.0f);
+        ImGui::SliderFloat("Amplitude attenuation", &amplitude_attenuation, 0.0f, 1.0f);
+        ImGui::SliderFloat("Frequency amplification", &frequency_amplification, 1.0f, 3.0f);
+
+        ImGui::ColorEdit3("Ocean color", (float*)&oceanColor);
+
+        ImGui::End();
+
+        ImGui::Begin("Light Parameters");
+
+        ImGui::SliderFloat3("Light position", &lightPos.x, -100.0f, 100.0f);
+        ImGui::SliderFloat3("Light color", &lightColor.x, 0.0f, 1.0f);
+        ImGui::SliderFloat("Light intensity", &lightIntensity, 0.0f, 10.0f);
+
+        ImGui::End();
+
         program_->use();
 
         program_->setUniform1f("time", time);
         program_->setUniform1i("numberOfWaves", numberOfWaves);
+        program_->setUniformVec3f("cameraPosition", camera_.Position.x, camera_.Position.y, camera_.Position.z);
+        program_->setUniform1f("roughness", roughness);
+        program_->setUniform1f("metallic", metallic);
+        program_->setUniform1f("amplitude", amplitude);
+        program_->setUniform1f("frequency", frequency);
+        program_->setUniform1f("amplitude_attenuation", amplitude_attenuation);
+        program_->setUniform1f("frequency_amplification", frequency_amplification);
+        program_->setUniformVec3f("lightPos", lightPos.x, lightPos.y, lightPos.z);
+        program_->setUniformVec3f("lightColor", lightColor.x, lightColor.y, lightColor.z);
+        program_->setUniform1f("lightIntensity", lightIntensity);
+        program_->setUniformVec3f("oceanColor", oceanColor.x, oceanColor.y, oceanColor.z);
 
         glm::mat4 view = camera_.GetViewMatrix();
         glm::mat4 projection = glm::perspective(camera_.Zoom, (float)m_windowWidth / (float)m_windowHeight, 0.1f, 1000.0f);
@@ -199,7 +243,7 @@ namespace Application
         vao_->bind();
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::scale(model, glm::vec3(50.0f, 50.0f, 50.0f));
+        model = glm::scale(model, glm::vec3(1000.0f, 1000.0f, 1000.0f));
         program_->setUniformMat4f("model", model);
 
         glDrawArrays(GL_PATCHES, 0, 4); CHECK_GL_ERROR();
@@ -210,37 +254,29 @@ namespace Application
         program_->unuse();
     }
 
-    void Application::ProcessInput(GLFWwindow* window)
-    {
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(window, true);
-
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            camera_.ProcessKeyboard(FORWARD, deltaTime);
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            camera_.ProcessKeyboard(BACKWARD, deltaTime);
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            camera_.ProcessKeyboard(LEFT, deltaTime);
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            camera_.ProcessKeyboard(RIGHT, deltaTime);
-    }
-
     void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     {
-        if (firstMouse)
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
         {
+            if (firstMouse)
+            {
+                lastX = xpos;
+            lastY = ypos;
+                firstMouse = false;
+            }
+
+            GLfloat xoffset = xpos - lastX;
+            GLfloat yoffset = lastY - ypos;
+
             lastX = xpos;
             lastY = ypos;
-            firstMouse = false;
+
+            camera_.ProcessMouseMovement(xoffset, yoffset);
         }
-
-        GLfloat xoffset = xpos - lastX;
-        GLfloat yoffset = lastY - ypos;
-
-        lastX = xpos;
-        lastY = ypos;
-
-        camera_.ProcessMouseMovement(xoffset, yoffset);
+        else
+        {
+            firstMouse = true;
+        }
     }
 
     void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
