@@ -143,115 +143,9 @@ namespace Application
             return;
         }
 
-        skybox_texture_ = loadCubemapTexture(skybox_faces);
-
-        skybox_vertices_ = {
-            // positions          
-            -4000.0,  4000.0, -4000.0,
-            -4000.0, -4000.0, -4000.0,
-            4000.0, -4000.0, -4000.0,
-            4000.0, -4000.0, -4000.0,
-            4000.0,  4000.0, -4000.0,
-            -4000.0,  4000.0, -4000.0,
-
-            -4000.0, -4000.0,  4000.0,
-            -4000.0, -4000.0, -4000.0,
-            -4000.0,  4000.0, -4000.0,
-            -4000.0,  4000.0, -4000.0,
-            -4000.0,  4000.0,  4000.0,
-            -4000.0, -4000.0,  4000.0,
-
-            4000.0, -4000.0, -4000.0,
-            4000.0, -4000.0,  4000.0,
-            4000.0,  4000.0,  4000.0,
-            4000.0,  4000.0,  4000.0,
-            4000.0,  4000.0, -4000.0,
-            4000.0, -4000.0, -4000.0,
-
-            -4000.0, -4000.0,  4000.0,
-            -4000.0,  4000.0,  4000.0,
-            4000.0,  4000.0,  4000.0,
-            4000.0,  4000.0,  4000.0,
-            4000.0, -4000.0,  4000.0,
-            -4000.0, -4000.0,  4000.0,
-
-            -4000.0,  4000.0, -4000.0,
-            4000.0,  4000.0, -4000.0,
-            4000.0,  4000.0,  4000.0,
-            4000.0,  4000.0,  4000.0,
-            -4000.0,  4000.0,  4000.0,
-            -4000.0,  4000.0, -4000.0,
-
-            -4000.0, -4000.0, -4000.0,
-            -4000.0, -4000.0,  4000.0,
-            4000.0, -4000.0, -4000.0,
-            4000.0, -4000.0, -4000.0,
-            -4000.0, -4000.0,  4000.0,
-            4000.0, -4000.0,  4000.0
-        };
-
-
-        // skybox_vertices_ = {
-        //     // positions          
-        //     -10.0,  10.0, -10.0,
-        //     -10.0, -10.0, -10.0,
-        //     10.0, -10.0, -10.0,
-        //     10.0, -10.0, -10.0,
-        //     10.0,  10.0, -10.0,
-        //     -10.0,  10.0, -10.0,
-
-        //     -10.0, -10.0,  10.0,
-        //     -10.0, -10.0, -10.0,
-        //     -10.0,  10.0, -10.0,
-        //     -10.0,  10.0, -10.0,
-        //     -10.0,  10.0,  10.0,
-        //     -10.0, -10.0,  10.0,
-
-        //     10.0, -10.0, -10.0,
-        //     10.0, -10.0,  10.0,
-        //     10.0,  10.0,  10.0,
-        //     10.0,  10.0,  10.0,
-        //     10.0,  10.0, -10.0,
-        //     10.0, -10.0, -10.0,
-
-        //     -10.0, -10.0,  10.0,
-        //     -10.0,  10.0,  10.0,
-        //     10.0,  10.0,  10.0,
-        //     10.0,  10.0,  10.0,
-        //     10.0, -10.0,  10.0,
-        //     -10.0, -10.0,  10.0,
-
-        //     -10.0,  10.0, -10.0,
-        //     10.0,  10.0, -10.0,
-        //     10.0,  10.0,  10.0,
-        //     10.0,  10.0,  10.0,
-        //     -10.0,  10.0,  10.0,
-        //     -10.0,  10.0, -10.0,
-
-        //     -10.0, -10.0, -10.0,
-        //     -10.0, -10.0,  10.0,
-        //     10.0, -10.0, -10.0,
-        //     10.0, -10.0, -10.0,
-        //     -10.0, -10.0,  10.0,
-        //     10.0, -10.0,  10.0
-        // };
-
         skybox_vao_ = new MyGL::Vao();
         skybox_vao_->bind();
-
-        MyGL::Vbo skybox_vbo;
-        skybox_vbo.bind();
-
-        skybox_vbo.setData(skybox_vertices_.data(), skybox_vertices_.size() * sizeof(float), GL_STATIC_DRAW);
-
-        MyGL::Vbl skybox_vbl;
-        skybox_vbl.push<float>(3);
-
-        skybox_vao_->addBuffer(skybox_vbo, skybox_vbl);
-
-        skybox_vbo.unbind();
         skybox_vao_->unbind();
-
         skybox_program_->unuse();
 
         program_->use();
@@ -342,22 +236,15 @@ namespace Application
         glm::mat4 view = camera_.GetViewMatrix();
         glm::mat4 projection = glm::perspective(camera_.Zoom, (float)m_windowWidth / (float)m_windowHeight, 0.1f, 10000.0f);
 
-        glDepthFunc(GL_LEQUAL); CHECK_GL_ERROR();
+        glDepthFunc(GL_LEQUAL);
         skybox_program_->use();
-
+        skybox_vao_->bind();
         skybox_program_->setUniformMat4f("view", view);
         skybox_program_->setUniformMat4f("projection", projection);
-
-        skybox_vao_->bind();
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, skybox_texture_);
         glDrawArrays(GL_TRIANGLES, 0, 36); CHECK_GL_ERROR();
-
         skybox_vao_->unbind();
         skybox_program_->unuse();
-
-        glDepthFunc(GL_LESS); CHECK_GL_ERROR();
+        glDepthFunc(GL_LESS);
 
         program_->use();
 
