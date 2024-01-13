@@ -43,6 +43,35 @@ namespace MyGL
         return program;
     }
 
+    Program* Program::make_program(std::string& vertex_shader_path, std::string& fragment_shader_path)
+    {
+        Program* program = new Program();
+
+        Shaders shaders = program->storeShaders(vertex_shader_path, fragment_shader_path);
+        unsigned int vertex_shader = program->compileShader(GL_VERTEX_SHADER, shaders.vertex_shader_path);
+        unsigned int fragment_shader = program->compileShader(GL_FRAGMENT_SHADER, shaders.fragment_shader_path);
+
+        glAttachShader(program->m_ProgramID, vertex_shader); CHECK_GL_ERROR();
+        glAttachShader(program->m_ProgramID, fragment_shader); CHECK_GL_ERROR();
+
+        glLinkProgram(program->m_ProgramID); CHECK_GL_ERROR();
+
+        if (!program->is_ready())
+        {
+            std::cerr << "ERROR::PROGRAM::LINKING_FAILED" << std::endl;
+            char* log = program->get_log();
+            std::cerr << log << std::endl;
+            delete[] log;
+            delete program;
+            return nullptr;
+        }
+
+        glDeleteShader(vertex_shader); CHECK_GL_ERROR();
+        glDeleteShader(fragment_shader); CHECK_GL_ERROR();
+
+        return program;
+    }
+
     char* Program::get_log()
     {
         int length;

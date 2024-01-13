@@ -32,6 +32,8 @@ namespace MyGL
 
         static Program* make_program(std::string& vertex_shader_path, std::string& fragment_shader_path,
                 std::string& tessellation_control_shader_path, std::string& tessellation_evaluation_shader_path);
+
+        static Program* make_program(std::string& vertex_shader_path, std::string& fragment_shader_path);
         
         char* get_log();
         bool is_ready();

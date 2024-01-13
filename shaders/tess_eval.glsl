@@ -14,6 +14,8 @@ uniform float frequency;
 uniform float amplitude_attenuation;
 uniform float frequency_amplification;
 
+uniform vec3 cameraPosition;
+
 out vec3 normal;
 out vec3 worldPosition;
 
@@ -41,7 +43,7 @@ float get_height_from_position(vec2 position)
         amplitude *= amplitude_attenuation;
         frequency *= frequency_amplification;
         vec2 wave_parameters = get_wave_height(position, direction, frequency, amplitude);
-        
+
         height += wave_parameters.x;
         position += direction * wave_parameters.y;
 

@@ -16,6 +16,10 @@ uniform vec3 lightPos;
 uniform vec3 lightColor;
 uniform float lightIntensity;
 
+float foamThreshold = 0.5;
+float foamScale = 0.5;
+float foamIntensity = 0.5;
+
 uniform vec3 oceanColor;
 
 vec4 sRGBToLinear( in vec4 value ) {
