@@ -68,7 +68,6 @@ namespace Application
 
             glm::vec3 oceanColor;
 
-            std::vector<float> skybox_vertices_ = {};
             MyGL::Program* skybox_program_ = nullptr;
             MyGL::Vao* skybox_vao_ = nullptr;
     };

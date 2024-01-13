@@ -2,8 +2,7 @@
 
 namespace Application
 {
-
-    Camera camera_(0.0f, 250.0f, 800.0f, 0.0f, 1.0f, 0.0f, -90.0f, 0.0f);
+    Camera camera_(1000.0f, 1000.0f, 800.0f, 0.0f, 1.0f, 0.0f, -90.0f, 0.0f);
     float lastX = 0.0f;
     float lastY = 0.0f;
 
@@ -11,10 +10,6 @@ namespace Application
     float lastFrame = 0.0f;
 
     bool firstMouse = true;
-
-    void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-
-    void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
     Application::Application()
     {
@@ -42,9 +37,6 @@ namespace Application
         {
             fprintf(stderr, "Failed to initialize OpenGL loader!\n");
         }
-
-        glfwSetCursorPosCallback(window_, mouse_callback);
-        glfwSetScrollCallback(window_, scroll_callback);
 
         glEnable(GL_DEPTH_TEST);
 
@@ -135,7 +127,9 @@ namespace Application
 
         std::string skybox_vertex_shader_path = "../shaders/skybox_shader_vert.glsl";
         std::string skybox_fragment_shader_path = "../shaders/skybox_shader_frag.glsl"; 
-        skybox_program_ = MyGL::Program::make_program(skybox_vertex_shader_path, skybox_fragment_shader_path);
+        std::string skybox_tessellation_control_shader_path = "../shaders/skybox_shader_tess_control.glsl";
+        std::string skybox_tessellation_evaluation_shader_path = "../shaders/skybox_shader_tess_eval.glsl";
+        skybox_program_ = MyGL::Program::make_program(skybox_vertex_shader_path, skybox_fragment_shader_path, skybox_tessellation_control_shader_path, skybox_tessellation_evaluation_shader_path);
 
         if (!skybox_program_)
         {
@@ -234,14 +228,16 @@ namespace Application
         ImGui::End();
 
         glm::mat4 view = camera_.GetViewMatrix();
-        glm::mat4 projection = glm::perspective(camera_.Zoom, (float)m_windowWidth / (float)m_windowHeight, 0.1f, 10000.0f);
+        glm::mat4 projection = glm::perspective(camera_.Zoom, (float)m_windowWidth / (float)m_windowHeight, 0.1f, 30000.0f);
 
         glDepthFunc(GL_LEQUAL);
         skybox_program_->use();
         skybox_vao_->bind();
+        skybox_program_->setUniform1f("time", time);
         skybox_program_->setUniformMat4f("view", view);
         skybox_program_->setUniformMat4f("projection", projection);
-        glDrawArrays(GL_TRIANGLES, 0, 36); CHECK_GL_ERROR();
+        glPatchParameteri(GL_PATCH_VERTICES, 4); CHECK_GL_ERROR();
+        glDrawArrays(GL_PATCHES, 0, 4); CHECK_GL_ERROR();
         skybox_vao_->unbind();
         skybox_program_->unuse();
         glDepthFunc(GL_LESS);
@@ -268,44 +264,14 @@ namespace Application
         vao_->bind();
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::scale(model, glm::vec3(1000.0f, 1000.0f, 1000.0f));
+        model = glm::scale(model, glm::vec3(10000.0f, 10000.0f, 10000.0f));
         program_->setUniformMat4f("model", model);
 
-        glDrawArrays(GL_PATCHES, 0, 4); CHECK_GL_ERROR();
         glPatchParameteri(GL_PATCH_VERTICES, 4); CHECK_GL_ERROR();
+        glDrawArrays(GL_PATCHES, 0, 4); CHECK_GL_ERROR();
 
         vao_->unbind();
 
         program_->unuse();
-    }
-
-    void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-    {
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-        {
-            if (firstMouse)
-            {
-                lastX = xpos;
-            lastY = ypos;
-                firstMouse = false;
-            }
-
-            GLfloat xoffset = xpos - lastX;
-            GLfloat yoffset = lastY - ypos;
-
-            lastX = xpos;
-            lastY = ypos;
-
-            camera_.ProcessMouseMovement(xoffset, yoffset);
-        }
-        else
-        {
-            firstMouse = true;
-        }
-    }
-
-    void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-    {
-        camera_.ProcessMouseScroll(yoffset);
     }
 }

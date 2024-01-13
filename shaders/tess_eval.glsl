@@ -57,7 +57,7 @@ vec3 get_normal(vec3 position, float epsilon)
 {
     float h = get_height_from_position(position.xz);
     float h_dx = get_height_from_position(position.xz - vec2(epsilon, 0.0));
-    float h_dz = get_height_from_position(position.xz + vec2(epsilon, 0.0));
+    float h_dz = get_height_from_position(position.xz + vec2(0.0, epsilon));
 
     vec3 normal = cross(vec3(epsilon, h - h_dx, 0.0), vec3(0.0, h - h_dz, -epsilon));
 
