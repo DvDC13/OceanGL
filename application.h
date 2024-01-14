@@ -54,19 +54,10 @@ namespace Application
             float time = 0.0f;
             int numberOfWaves;
 
-            float roughness;
-            float metallic;
-
             float amplitude;
             float frequency;
             float amplitude_attenuation;
             float frequency_amplification;
-
-            glm::vec3 lightPos;
-            glm::vec3 lightColor;
-            float lightIntensity;
-
-            glm::vec3 oceanColor;
 
             MyGL::Program* skybox_program_ = nullptr;
             MyGL::Vao* skybox_vao_ = nullptr;

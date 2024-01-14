@@ -171,19 +171,11 @@ namespace Application
         program_->unuse();
 
         numberOfWaves = 40;
-        roughness = 0.5f;
-        metallic = 0.5f;
 
         amplitude = 0.05f;
         frequency = 3.0f;
         amplitude_attenuation = 0.82f;
         frequency_amplification = 1.18f;
-
-        lightPos = glm::vec3(0.0f, 10.0f, 0.0f);
-        lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-        lightIntensity = 1.0f;
-
-        oceanColor = glm::vec3(0.0f, 0.0f, 1.0f);
     }
 
     void Application::Update()
@@ -208,22 +200,10 @@ namespace Application
         ImGui::Begin("Ocean Parameters");
 
         ImGui::SliderInt("Number of waves", &numberOfWaves, 0, 100);
-        ImGui::SliderFloat("Roughness", &roughness, 0.0f, 1.0f);
-        ImGui::SliderFloat("Metallic", &metallic, 0.0f, 1.0f);
         ImGui::SliderFloat("Amplitude", &amplitude, 0.0f, 1.0f);
         ImGui::SliderFloat("Frequency", &frequency, 0.0f, 100.0f);
         ImGui::SliderFloat("Amplitude attenuation", &amplitude_attenuation, 0.0f, 1.0f);
         ImGui::SliderFloat("Frequency amplification", &frequency_amplification, 1.0f, 3.0f);
-
-        ImGui::ColorEdit3("Ocean color", (float*)&oceanColor);
-
-        ImGui::End();
-
-        ImGui::Begin("Light Parameters");
-
-        ImGui::SliderFloat3("Light position", &lightPos.x, -100.0f, 100.0f);
-        ImGui::SliderFloat3("Light color", &lightColor.x, 0.0f, 1.0f);
-        ImGui::SliderFloat("Light intensity", &lightIntensity, 0.0f, 10.0f);
 
         ImGui::End();
 
@@ -247,16 +227,10 @@ namespace Application
         program_->setUniform1f("time", time);
         program_->setUniform1i("numberOfWaves", numberOfWaves);
         program_->setUniformVec3f("cameraPosition", camera_.Position.x, camera_.Position.y, camera_.Position.z);
-        program_->setUniform1f("roughness", roughness);
-        program_->setUniform1f("metallic", metallic);
         program_->setUniform1f("amplitude", amplitude);
         program_->setUniform1f("frequency", frequency);
         program_->setUniform1f("amplitude_attenuation", amplitude_attenuation);
         program_->setUniform1f("frequency_amplification", frequency_amplification);
-        program_->setUniformVec3f("lightPos", lightPos.x, lightPos.y, lightPos.z);
-        program_->setUniformVec3f("lightColor", lightColor.x, lightColor.y, lightColor.z);
-        program_->setUniform1f("lightIntensity", lightIntensity);
-        program_->setUniformVec3f("oceanColor", oceanColor.x, oceanColor.y, oceanColor.z);
 
         program_->setUniformMat4f("view", view);
         program_->setUniformMat4f("projection", projection);
