@@ -213,7 +213,7 @@ namespace Application
         glDepthFunc(GL_LEQUAL);
         skybox_program_->use();
         skybox_vao_->bind();
-        skybox_program_->setUniform1f("time", time);
+        skybox_program_->setUniformVec3f("cameraPosition", camera_.Position.x, camera_.Position.y, camera_.Position.z);
         skybox_program_->setUniformMat4f("view", view);
         skybox_program_->setUniformMat4f("projection", projection);
         glPatchParameteri(GL_PATCH_VERTICES, 4); CHECK_GL_ERROR();
