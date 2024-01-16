@@ -46,9 +46,20 @@ void main()
     float SdotReflectedCoeff = pow(max(dot(S, reflectDir), 0.0), 10);
     vec3 sunColor = sunColor * SdotReflectedCoeff;
 
+    // Fresnel term
+    float fresnel = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+    fresnel = mix(0.1, 1.0, fresnel);
+    reflectColor *= fresnel;
+
+    // Surface more reflective at grazing angles
+    float theta = dot(N, V);
+    float reflectance = 0.5 + 0.5 * pow(1.0 - theta, 5.0);
+    reflectColor = mix(reflectColor, sunColor, reflectance);
+
     // Combine color components
     vec3 color = ambient + diffuse + heightColor + reflectColor + sunColor;
 
     // Set the fragment color
     FragColor = vec4(color, 1.0);
+
 }
