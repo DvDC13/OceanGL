@@ -74,7 +74,7 @@ void main()
 
 	p += vec4 (0.0, height, 0.0, 0.0);
 
-    normal = get_normal(p.xyz, 0.01);
+    normal = get_normal(p.xyz, 0.1);
 
     gl_Position = projection * view * model * p;
     
