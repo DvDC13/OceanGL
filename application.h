@@ -61,6 +61,9 @@ namespace Application
             float epsilon;
             glm::vec3 sunDirection;
 
+            glm::vec3 shallowColor;
+            glm::vec3 deepColor;
+
             int scaleX;
             int scaleZ;
 

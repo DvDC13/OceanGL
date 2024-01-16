@@ -7,6 +7,8 @@ in vec3 worldPosition;
 
 uniform vec3 cameraPosition;
 uniform vec3 sunDirection;
+uniform vec3 shallowColor;
+uniform vec3 deepColor;
 
 const float M_PI = 3.14159265359;
 
@@ -14,9 +16,7 @@ const float M_PI = 3.14159265359;
 const vec3 skyColor = vec3(0.65, 0.80, 0.95);
 const vec3 sunAmbient = vec3(0.02, 0.02, 0.05); // Even darker ambient light
 const vec3 sunDiffuse = vec3(0.5, 0.5, 0.8); // Much less intense diffuse light
-const vec3 shallowColor = vec3(0.0, 0.25, 0.3); // Darker shallow water color
-const vec3 deepColor = vec3(0.0, 0.05, 0.2); // Very dark deep water color
-vec3 sunColor = vec3(0.4, 0.4, 0.4); // Sun color
+const vec3 sunColor = vec3(0.4, 0.4, 0.4); // Sun color
 
 void main()
 {
@@ -42,9 +42,9 @@ void main()
     // Reflected light from the sun
     vec3 reflectDir = reflect(S, N); 
 
-    // Sun Color
+    // Sun Color Effect
     float SdotReflectedCoeff = pow(max(dot(S, reflectDir), 0.0), 10);
-    vec3 sunColor = sunColor * SdotReflectedCoeff;
+    vec3 sunColorEffect = sunColor * SdotReflectedCoeff;
 
     // Fresnel term
     float fresnel = pow(1.0 - max(dot(N, V), 0.0), 3.0);
@@ -54,10 +54,10 @@ void main()
     // Surface more reflective at grazing angles
     float theta = dot(N, V);
     float reflectance = 0.5 + 0.5 * pow(1.0 - theta, 5.0);
-    reflectColor = mix(reflectColor, sunColor, reflectance);
+    reflectColor = mix(reflectColor, sunColorEffect, reflectance);
 
     // Combine color components
-    vec3 color = ambient + diffuse + heightColor + reflectColor + sunColor;
+    vec3 color = ambient + diffuse + heightColor + reflectColor + sunColorEffect;
 
     // Set the fragment color
     FragColor = vec4(color, 1.0);

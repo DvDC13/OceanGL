@@ -183,6 +183,9 @@ namespace Application
         epsilon = 0.1f;
 
         sunDirection = glm::vec3(3.0f, 2.0f, -5.0f);
+
+        shallowColor = glm::vec3(0.0, 0.25, 0.3);
+        deepColor = glm::vec3(0.0, 0.05, 0.2);
     }
 
     void Application::Update()
@@ -206,13 +209,15 @@ namespace Application
 
         ImGui::Begin("Ocean Parameters");
 
-        ImGui::SliderInt("Number of waves", &numberOfWaves, 0, 100);
-        ImGui::SliderFloat("Amplitude", &amplitude, 0.0f, 1.0f);
-        ImGui::SliderFloat("Frequency", &frequency, 0.0f, 100.0f);
+        ImGui::SliderInt("Number of waves", &numberOfWaves, 0, 50);
+        ImGui::SliderFloat("Amplitude", &amplitude, 0.0f, 0.5f);
+        ImGui::SliderFloat("Frequency", &frequency, 0.0f, 10.0f);
         ImGui::SliderFloat("Amplitude attenuation", &amplitude_attenuation, 0.0f, 1.0f);
-        ImGui::SliderFloat("Frequency amplification", &frequency_amplification, 1.0f, 3.0f);
+        ImGui::SliderFloat("Frequency amplification", &frequency_amplification, 1.0f, 2.0f);
         ImGui::SliderFloat("Epsilon", &epsilon, 0.001f, 0.5f);
         ImGui::SliderFloat3("Sun direction", &sunDirection.x, -10.0f, 10.0f);
+        ImGui::SliderFloat3("Shallow color", &shallowColor.x, 0.0f, 1.0f);
+        ImGui::SliderFloat3("Deep color", &deepColor.x, 0.0f, 1.0f);
 
         ImGui::Separator();
 
@@ -263,6 +268,8 @@ namespace Application
         program_->setUniform1f("frequency_amplification", frequency_amplification);
         program_->setUniform1f("epsilon", epsilon);
         program_->setUniformVec3f("sunDirection", sunDirection.x, sunDirection.y, sunDirection.z);
+        program_->setUniformVec3f("shallowColor", shallowColor.x, shallowColor.y, shallowColor.z);
+        program_->setUniformVec3f("deepColor", deepColor.x, deepColor.y, deepColor.z);
 
         program_->setUniformMat4f("view", view);
         program_->setUniformMat4f("projection", projection);
