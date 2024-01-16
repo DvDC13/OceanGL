@@ -23,6 +23,5 @@ void main()
     skyColor += sunColor * VdotSun * sunIntensity;
     skyColor += dayColor * (1.0 - VdotSun);
     
-    // = dayColor + sunColor * sunIntensity;
     FragColor = vec4(skyColor, 1.0);
 }
