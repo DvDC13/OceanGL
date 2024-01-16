@@ -2,7 +2,8 @@
 
 namespace Application
 {
-    Camera camera_(1000.0f, 1000.0f, 800.0f, 0.0f, 1.0f, 0.0f, -90.0f, 0.0f);
+    Camera camera_(0.0f, 0.4f, 2.5f, 0.0f, 1.0f, 0.0f, -90.0f, 0.0f);
+
     float lastX = 0.0f;
     float lastY = 0.0f;
 
@@ -112,10 +113,10 @@ namespace Application
 
     void Application::Start()
     {
-        std::string vertex_shader_path = "../shaders/vertex_shader.glsl";
-        std::string fragment_shader_path = "../shaders/fragment_shader.glsl";
-        std::string tessellation_control_shader_path = "../shaders/tess_control.glsl";
-        std::string tessellation_evaluation_shader_path = "../shaders/tess_eval.glsl";
+        std::string vertex_shader_path = "../shaders/ocean_vertex_shader.glsl";
+        std::string fragment_shader_path = "../shaders/ocean_fragment_shader.glsl";
+        std::string tessellation_control_shader_path = "../shaders/ocean_tess_control.glsl";
+        std::string tessellation_evaluation_shader_path = "../shaders/ocean_tess_eval.glsl";
 
         program_ = MyGL::Program::make_program(vertex_shader_path, fragment_shader_path, tessellation_control_shader_path, tessellation_evaluation_shader_path);
 
@@ -144,12 +145,15 @@ namespace Application
 
         program_->use();
 
+        scaleX = 1;
+        scaleZ = 1;
+
         // create a larger plane
         vertices_positions_ = {
-            -1.0f, 0.0f, -1.0f, // bottom left
-            1.0f, 0.0f, -1.0f, // bottom right
-            1.0f, 0.0f, 1.0f, // top right
-            -1.0f, 0.0f, 1.0f  // top left
+            -1.0f * scaleX, 0.0f, -1.0f * scaleZ, // bottom left
+            1.0f * scaleX, 0.0f, -1.0f * scaleZ, // bottom right
+            1.0f * scaleX, 0.0f, 1.0f * scaleZ, // top right
+            -1.0f * scaleX, 0.0f, 1.0f * scaleZ  // top left
         };
 
         vao_ = new MyGL::Vao();
@@ -176,6 +180,7 @@ namespace Application
         frequency = 3.0f;
         amplitude_attenuation = 0.82f;
         frequency_amplification = 1.18f;
+        epsilon = 0.1f;
 
         sunDirection = glm::vec3(3.0f, 2.0f, -5.0f);
     }
@@ -206,12 +211,33 @@ namespace Application
         ImGui::SliderFloat("Frequency", &frequency, 0.0f, 100.0f);
         ImGui::SliderFloat("Amplitude attenuation", &amplitude_attenuation, 0.0f, 1.0f);
         ImGui::SliderFloat("Frequency amplification", &frequency_amplification, 1.0f, 3.0f);
+        ImGui::SliderFloat("Epsilon", &epsilon, 0.001f, 0.5f);
         ImGui::SliderFloat3("Sun direction", &sunDirection.x, -10.0f, 10.0f);
+
+        ImGui::Separator();
+
+        ImGui::SliderInt("Scale X", &scaleX, 1, 10);
+        ImGui::SliderInt("Scale Z", &scaleZ, 1, 10);
+
+        ImGui::Checkbox("Switch View", &nearView);
 
         ImGui::End();
 
+        if (nearView)
+        {
+            camera_.Position = glm::vec3(0.0f, 0.1f, 0.2f);
+            camera_.Yaw = -90.0f;
+            camera_.Pitch = 0.0f;
+        }
+        else
+        {
+            camera_.Position = glm::vec3(0.0f, 0.4f, 2.5f);
+            camera_.Yaw = -90.0f;
+            camera_.Pitch = 0.0f;
+        }
+
         glm::mat4 view = camera_.GetViewMatrix();
-        glm::mat4 projection = glm::perspective(camera_.Zoom, (float)m_windowWidth / (float)m_windowHeight, 0.1f, 30000.0f);
+        glm::mat4 projection = glm::perspective(camera_.Zoom, (float)m_windowWidth / (float)m_windowHeight, 0.1f, 1000.0f);
 
         glDepthFunc(GL_LEQUAL);
         skybox_program_->use();
@@ -235,6 +261,7 @@ namespace Application
         program_->setUniform1f("frequency", frequency);
         program_->setUniform1f("amplitude_attenuation", amplitude_attenuation);
         program_->setUniform1f("frequency_amplification", frequency_amplification);
+        program_->setUniform1f("epsilon", epsilon);
         program_->setUniformVec3f("sunDirection", sunDirection.x, sunDirection.y, sunDirection.z);
 
         program_->setUniformMat4f("view", view);
@@ -243,7 +270,7 @@ namespace Application
         vao_->bind();
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::scale(model, glm::vec3(10000.0f, 10000.0f, 10000.0f));
+        model = glm::scale(model, glm::vec3(scaleX, 1.0f, scaleZ));
         program_->setUniformMat4f("model", model);
 
         glPatchParameteri(GL_PATCH_VERTICES, 4); CHECK_GL_ERROR();

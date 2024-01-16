@@ -13,6 +13,7 @@ uniform float amplitude;
 uniform float frequency;
 uniform float amplitude_attenuation;
 uniform float frequency_amplification;
+uniform float epsilon;
 
 uniform vec3 cameraPosition;
 
@@ -74,7 +75,7 @@ void main()
 
 	p += vec4 (0.0, height, 0.0, 0.0);
 
-    normal = get_normal(p.xyz, 0.1);
+    normal = get_normal(p.xyz, epsilon);
 
     gl_Position = projection * view * model * p;
     

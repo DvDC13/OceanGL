@@ -58,10 +58,15 @@ namespace Application
             float frequency;
             float amplitude_attenuation;
             float frequency_amplification;
+            float epsilon;
+            glm::vec3 sunDirection;
+
+            int scaleX;
+            int scaleZ;
+
+            bool nearView = false;
 
             MyGL::Program* skybox_program_ = nullptr;
-            MyGL::Vao* skybox_vao_ = nullptr;
-
-            glm::vec3 sunDirection;
+            MyGL::Vao* skybox_vao_ = nullptr;    
     };
 }
