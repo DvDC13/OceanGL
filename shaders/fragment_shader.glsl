@@ -7,22 +7,25 @@ in vec3 worldPosition;
 
 uniform vec3 cameraPosition;
 uniform vec3 lightPos;
+uniform vec3 sunDirection;
 
 const float M_PI = 3.14159265359;
 
-// Color constants
+// Color constants for a much darker ocean
 const vec3 skyColor = vec3(0.65, 0.80, 0.95);
-const vec3 lightAmbient = vec3(0.05, 0.05, 0.1); // Darker ambient light
-const vec3 lightDiffuse = vec3(0.8, 0.8, 1.0); // Less intense diffuse light
-const vec3 lightSpecular = vec3(0.9, 0.9, 1.0); // Subtle specular highlight
-const vec3 shallowColor = vec3(0.0, 0.22, 0.30); // Darker shallow water color
-const vec3 deepColor = vec3(0.005, 0.015, 0.03); // Darker deep water color
+const vec3 lightAmbient = vec3(0.02, 0.02, 0.05); // Even darker ambient light
+const vec3 lightDiffuse = vec3(0.5, 0.5, 0.8); // Much less intense diffuse light
+const vec3 lightSpecular = vec3(0.7, 0.7, 0.9); // Reduced specular highlight
+const vec3 shallowColor = vec3(0.0, 0.1, 0.2); // Darker shallow water color
+const vec3 deepColor = vec3(0.0, 0.05, 0.1); // Very dark deep water color
+const vec3 sunColor = vec3(0.4, 0.4, 0.4); // Sun color
 
 void main()
-{    
+{
     vec3 L = normalize(lightPos - worldPosition);
     vec3 N = normalize(normal);
     vec3 V = normalize(cameraPosition - worldPosition);
+    vec3 S = normalize(sunDirection);
 
     // Ambient term
     vec3 ambient = lightAmbient;
@@ -44,8 +47,12 @@ void main()
 	float specCoeff = pow(max(dot(V, reflectDir), 0.0), 128);
     vec3 specular = lightSpecular * specCoeff;
 
+    // Sun Color
+    float SdotReflectedCoeff = pow(max(dot(S, reflectDir), 0.0), 10);
+    vec3 sunColor = sunColor * SdotReflectedCoeff;
+
     // Combine color components
-    vec3 color = ambient + diffuse + heightColor + reflectColor;
+    vec3 color = ambient + diffuse + heightColor + reflectColor + sunColor;
 	color += specular * specCoeff;
 
     // Set the fragment color

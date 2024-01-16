@@ -176,6 +176,8 @@ namespace Application
         frequency = 3.0f;
         amplitude_attenuation = 0.82f;
         frequency_amplification = 1.18f;
+
+        sunDirection = glm::vec3(3.0f, 2.0f, -5.0f);
     }
 
     void Application::Update()
@@ -204,6 +206,7 @@ namespace Application
         ImGui::SliderFloat("Frequency", &frequency, 0.0f, 100.0f);
         ImGui::SliderFloat("Amplitude attenuation", &amplitude_attenuation, 0.0f, 1.0f);
         ImGui::SliderFloat("Frequency amplification", &frequency_amplification, 1.0f, 3.0f);
+        ImGui::SliderFloat3("Sun direction", &sunDirection.x, -10.0f, 10.0f);
 
         ImGui::End();
 
@@ -216,6 +219,7 @@ namespace Application
         skybox_program_->setUniformVec3f("cameraPosition", camera_.Position.x, camera_.Position.y, camera_.Position.z);
         skybox_program_->setUniformMat4f("view", view);
         skybox_program_->setUniformMat4f("projection", projection);
+        skybox_program_->setUniformVec3f("sunDirection", sunDirection.x, sunDirection.y, sunDirection.z);
         glPatchParameteri(GL_PATCH_VERTICES, 4); CHECK_GL_ERROR();
         glDrawArrays(GL_PATCHES, 0, 4); CHECK_GL_ERROR();
         skybox_vao_->unbind();
@@ -231,6 +235,7 @@ namespace Application
         program_->setUniform1f("frequency", frequency);
         program_->setUniform1f("amplitude_attenuation", amplitude_attenuation);
         program_->setUniform1f("frequency_amplification", frequency_amplification);
+        program_->setUniformVec3f("sunDirection", sunDirection.x, sunDirection.y, sunDirection.z);
 
         program_->setUniformMat4f("view", view);
         program_->setUniformMat4f("projection", projection);

@@ -61,5 +61,7 @@ namespace Application
 
             MyGL::Program* skybox_program_ = nullptr;
             MyGL::Vao* skybox_vao_ = nullptr;
+
+            glm::vec3 sunDirection;
     };
 }
