@@ -61,5 +61,4 @@ void main()
 
     // Set the fragment color
     FragColor = vec4(color, 1.0);
-
 }

@@ -6,6 +6,8 @@
 
 #include <vector>
 
+// LearnOpenGL: Camera class
+
 enum Camera_Movement {
     FORWARD,
     BACKWARD,

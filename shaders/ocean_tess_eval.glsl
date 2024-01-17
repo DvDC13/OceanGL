@@ -14,19 +14,19 @@ uniform float frequency;
 uniform float amplitude_attenuation;
 uniform float frequency_amplification;
 uniform float epsilon;
+uniform float seed;
 
 uniform vec3 cameraPosition;
 
 out vec3 normal;
 out vec3 worldPosition;
 
-vec2 get_wave_height(vec2 position, vec2 direction, float frequency, float amplitude)
+float get_wave_height(vec2 position, vec2 direction, float frequency, float amplitude)
 {
     position -= vec2(1.0, 1.0);
     float proj = dot(position, direction);
     float height = amplitude * (exp(sin(proj * frequency + time) - 1.0) - (1 + exp(-2))/2);
-    float derivative = height * cos(proj * frequency + time);
-    return vec2(height, -derivative);
+    return height;
 }
 
 float get_height_from_position(vec2 position)
@@ -43,12 +43,9 @@ float get_height_from_position(vec2 position)
         vec2 direction = normalize(vec2(sin(random), cos(random)));
         amplitude *= amplitude_attenuation;
         frequency *= frequency_amplification;
-        vec2 wave_parameters = get_wave_height(position, direction, frequency, amplitude);
+        height += get_wave_height(position, direction, frequency, amplitude);
 
-        height += wave_parameters.x;
-        position += direction * wave_parameters.y;
-
-        random += 1229.0;
+        random += seed;
     }
 
     return height;

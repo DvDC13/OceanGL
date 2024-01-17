@@ -59,6 +59,7 @@ namespace Application
             float amplitude_attenuation;
             float frequency_amplification;
             float epsilon;
+            float seed;
             glm::vec3 sunDirection;
 
             glm::vec3 shallowColor;

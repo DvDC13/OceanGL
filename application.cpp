@@ -181,6 +181,7 @@ namespace Application
         amplitude_attenuation = 0.82f;
         frequency_amplification = 1.18f;
         epsilon = 0.1f;
+        seed = 1.0f;
 
         sunDirection = glm::vec3(3.0f, 2.0f, -5.0f);
 
@@ -215,6 +216,7 @@ namespace Application
         ImGui::SliderFloat("Amplitude attenuation", &amplitude_attenuation, 0.0f, 1.0f);
         ImGui::SliderFloat("Frequency amplification", &frequency_amplification, 1.0f, 2.0f);
         ImGui::SliderFloat("Epsilon", &epsilon, 0.001f, 0.5f);
+        ImGui::SliderFloat("Seed", &seed, 0.0f, 7.0f);
         ImGui::SliderFloat3("Sun direction", &sunDirection.x, -10.0f, 10.0f);
         ImGui::SliderFloat3("Shallow color", &shallowColor.x, 0.0f, 1.0f);
         ImGui::SliderFloat3("Deep color", &deepColor.x, 0.0f, 1.0f);
@@ -267,6 +269,7 @@ namespace Application
         program_->setUniform1f("amplitude_attenuation", amplitude_attenuation);
         program_->setUniform1f("frequency_amplification", frequency_amplification);
         program_->setUniform1f("epsilon", epsilon);
+        program_->setUniform1f("seed", seed);
         program_->setUniformVec3f("sunDirection", sunDirection.x, sunDirection.y, sunDirection.z);
         program_->setUniformVec3f("shallowColor", shallowColor.x, shallowColor.y, shallowColor.z);
         program_->setUniformVec3f("deepColor", deepColor.x, deepColor.y, deepColor.z);
