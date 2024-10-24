@@ -18,6 +18,6 @@
 
 > GLEW
  
-## Image Example
+# Image Example
 
 ![Drag Racing](./oceanGL.png)
