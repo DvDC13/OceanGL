@@ -20,4 +20,4 @@
  
 ## Image Example
 
-![Drag Racing](./example/oceanGL.png)
+![Drag Racing](./oceanGL.png)
